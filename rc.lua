@@ -59,8 +59,10 @@ end
 -- This is used later as the default terminal and editor to run.
 local hostname = io.lines("/proc/sys/kernel/hostname")
 terminal = "xterm"
-if hostname == 'w1c' then
-    terminal = "xfce4-terminal"
+for line in hostname do
+   if line == 'w1c' then
+      terminal = "xfce4-terminal"
+   end
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
 editor_cmd = terminal .. " -e " .. editor
