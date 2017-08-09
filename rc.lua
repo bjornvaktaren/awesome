@@ -52,7 +52,7 @@ end
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(awful.util.getdir("config") .. "themes/default/theme.lua")
 for s = 1, screen.count() do
-	gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+   gears.wallpaper.maximized(beautiful.wallpaper, s, true)
 end
 -- beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
 
