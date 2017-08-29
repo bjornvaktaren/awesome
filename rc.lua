@@ -61,12 +61,16 @@ end
 -- Host-specific configuration
 local hostname = io.lines("/proc/sys/kernel/hostname")
 terminal = "xterm"
-screenshooter = ""
+screenshooter = "scrot"
 for line in hostname do
    if line == 'w1c' then
       terminal = "xfce4-terminal"
       screenshooter = "xfce4-screenshooter"
       awful.util.spawn("cernbox")
+   end
+   if line == 'mmpem' then
+      terminal = "xterm"
+      screenshooter = "scrot"
    end
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
