@@ -59,9 +59,11 @@ end
 -- This is used later as the default terminal and editor to run.
 local hostname = io.lines("/proc/sys/kernel/hostname")
 terminal = "xterm"
+screenshooter = ""
 for line in hostname do
    if line == 'w1c' then
       terminal = "xfce4-terminal"
+      screenshooter = "xfce4-screenshooter"
    end
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
@@ -278,6 +280,10 @@ globalkeys = gears.table.join(
    -- Backlight keys
    awful.key({}, "XF86MonBrightnessDown", function() brightness_ctrl:down() end),
    awful.key({}, "XF86MonBrightnessUp", function() brightness_ctrl:up() end),
+   -- Screenshot key
+   awful.key({}, "Print", function ()
+	 awful.util.spawn(screenshooter, false)
+   end),
    -- Default keys
    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
       {description="show help", group="awesome"}),
