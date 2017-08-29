@@ -14,10 +14,10 @@ echo "Internal display is ${intern}, external is ${extern}"
 
 if [[ $# -eq 0 ]]; then
     if xrandr | grep "$extern disconnected"; then
-	echo "Using ${extern} only"
+	echo "Using ${intern} only"
 	xrandr --output "$extern" --off --output "$intern" --auto
     else
-	echo "Using ${intern} only"
+	echo "Using ${extern} only"
 	xrandr --output "$intern" --off --output "$extern" --auto
     fi
 fi
