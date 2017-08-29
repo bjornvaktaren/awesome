@@ -13,6 +13,8 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 -- Enable VIM help for hotkeys widget when client with matching name is opened:
 require("awful.hotkeys_popup.keys.vim")
 -- Mikael's additions
+-- Add network-manager widget
+awful.util.spawn("nm-applet")
 -- Add battery widget
 require("battery")
 -- Add volume widget
@@ -56,7 +58,7 @@ for s = 1, screen.count() do
 end
 -- beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
 
--- This is used later as the default terminal and editor to run.
+-- Host-specific configuration
 local hostname = io.lines("/proc/sys/kernel/hostname")
 terminal = "xterm"
 screenshooter = ""
@@ -64,6 +66,7 @@ for line in hostname do
    if line == 'w1c' then
       terminal = "xfce4-terminal"
       screenshooter = "xfce4-screenshooter"
+      awful.util.spawn("cernbox")
    end
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
@@ -91,9 +94,9 @@ awful.layout.layouts = {
     awful.layout.suit.max.fullscreen,
     awful.layout.suit.magnifier,
     awful.layout.suit.corner.nw,
-    -- awful.layout.suit.corner.ne,
-    -- awful.layout.suit.corner.sw,
-    -- awful.layout.suit.corner.se,
+    awful.layout.suit.corner.ne,
+    awful.layout.suit.corner.sw,
+    awful.layout.suit.corner.se,
 }
 -- }}}
 
