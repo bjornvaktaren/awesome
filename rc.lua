@@ -15,13 +15,10 @@ require("awful.hotkeys_popup.keys.vim")
 -- Mikael's additions
 -- Add network-manager widget
 awful.util.spawn("nm-applet")
--- Add battery widget
-require("battery")
 -- Add volume widget
 require("volume")
--- Add brightness widget
-brightness = require("brightness")
-brightness_ctrl = brightness({step=10})
+-- -- Add quicklaunch
+-- quicklaunch = require("quicklaunch")
 -- Autostart programs
 awful.util.spawn_with_shell("~/.config/awesome/autorun.sh")
 
@@ -68,6 +65,10 @@ for line in hostname do
       screenshooter = "xfce4-screenshooter"
       awful.util.spawn("cernbox")
    end
+   if line == 'vi7' then
+      terminal = "xfce4-terminal"
+      screenshooter = "xfce4-screenshooter"
+   end
    if line == 'mmpem' then
       terminal = "xterm"
       screenshooter = "scrot"
@@ -75,6 +76,11 @@ for line in hostname do
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
 editor_cmd = terminal .. " -e " .. editor
+
+-- -- quicklaunch specification
+-- local launchbar = quicklaunch:bar({
+--       { "Pavucontrol", "pavucontrol.png", "pavucontrol"},
+-- })
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -241,14 +247,13 @@ awful.screen.connect_for_each_screen(function(s)
             mylauncher,
             s.mytaglist,
             s.mypromptbox,
+	    -- quicklaunch,
 	 },
 	 s.mytasklist, -- Middle widget
 	 { -- Right widgets
 	    layout = wibox.layout.fixed.horizontal,
 	    wibox.widget.systray(),
-	    brightness_ctrl.widget,
 	    volume_widget,
-	    battery_widget,
 	    mykeyboardlayout,
 	    mytextclock,
 	    s.mylayoutbox,

@@ -37,11 +37,17 @@ end
 - clicking on the widget to mute/unmute
 - scrolling when curson is over the widget
 ]]
-volume_widget:connect_signal("button::press", function(_,_,_,button)
-    if (button == 4)     then awful.spawn("amixer -D pulse sset Master 5%+", false)
-    elseif (button == 5) then awful.spawn("amixer -D pulse sset Master 5%-", false)
-    elseif (button == 1) then awful.spawn("amixer -D pulse sset Master toggle", false)
-    end
+volume_widget:connect_signal(
+   "button::press", function(_,_,_,button)
+      if (button == 4) then
+	 awful.spawn("amixer -D pulse sset Master 5%+", false)
+      elseif (button == 5) then
+	 awful.spawn("amixer -D pulse sset Master 5%-", false)
+      elseif (button == 1) then
+	 awful.spawn("amixer -D pulse sset Master toggle", false)
+      elseif (button == 3) then
+	 awful.spawn("pavucontrol")
+      end
     
     spawn.easy_async(request_command, function(stdout, stderr, exitreason, exitcode)
         update_graphic(volume_widget, stdout, stderr, exitreason, exitcode)
