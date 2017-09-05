@@ -50,6 +50,8 @@ volume_widget:connect_signal(
 	 awful.spawn("amixer -D pulse sset Master 5%-", false)
       elseif (button == 1) then
 	 awful.spawn("amixer -D pulse sset Master toggle", false)
+      elseif (button == 3) then
+	 awful.spawn("pavucontrol")
       end
     
       spawn.easy_async(request_command,
