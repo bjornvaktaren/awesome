@@ -19,6 +19,8 @@ volume_widget = wibox.widget {
     end
 }
 
+volume_popup = awful.tooltip({objects = {volume_widget}})
+
 local update_graphic = function(widget, stdout, stderr, reason, exit_code)
     local mute = string.match(stdout, "%[(o%D%D?)%]")
     local volume = string.match(stdout, "(%d?%d?%d)%%")
@@ -36,6 +38,7 @@ local update_graphic = function(widget, stdout, stderr, reason, exit_code)
        volume_icon_name="audio-volume-high-symbolic"
     end
     widget.image = path_to_icons .. volume_icon_name .. ".svg"
+    volume_popup.text = string.format("%u%%",volume)
 end
 
 --[[ allows control volume level by:
@@ -53,7 +56,6 @@ volume_widget:connect_signal(
       elseif (button == 3) then
 	 awful.spawn("pavucontrol")
       end
-    
       spawn.easy_async(request_command,
 		       function(stdout, stderr, exitreason, exitcode)
 			  update_graphic(volume_widget, stdout, stderr,
