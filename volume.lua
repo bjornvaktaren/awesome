@@ -4,7 +4,7 @@ local watch = require("awful.widget.watch")
 local spawn = require("awful.spawn")
 
 local path_to_icons = "/usr/share/icons/Arc/status/symbolic/"
-local request_command = 'amixer -D pulse sget Master'
+local request_command = 'amixer -c 1 sget Master'
 
 volume_widget = wibox.widget {
     {
