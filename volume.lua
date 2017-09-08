@@ -18,19 +18,26 @@ volume_widget = wibox.widget {
         self.icon.image = path
     end
 }
+volume_popup = awful.tooltip({objects = {volume_widget}})
 
 local update_graphic = function(widget, stdout, stderr, reason, exit_code)
-    local mute = string.match(stdout, "%[(o%D%D?)%]")
-    local volume = string.match(stdout, "(%d?%d?%d)%%")
-    volume = tonumber(string.format("% 3d", volume))
-    local volume_icon_name
-    if mute == "off"                     then volume_icon_name="audio-volume-muted-symbolic"
-    elseif (volume >= 0 and volume < 25) then volume_icon_name="audio-volume-muted-symbolic"
-    elseif (volume < 50)                 then volume_icon_name="audio-volume-low-symbolic"
-    elseif (volume < 75)                 then volume_icon_name="audio-volume-medium-symbolic"
-    elseif (volume <= 100)               then volume_icon_name="audio-volume-high-symbolic"
-    end
-    widget.image = path_to_icons .. volume_icon_name .. ".svg"
+   local mute = string.match(stdout, "%[(o%D%D?)%]")
+   local volume = string.match(stdout, "(%d?%d?%d)%%")
+   volume = tonumber(string.format("% 3d", volume))
+   local volume_icon_name
+   if mute == "off"  then
+      volume_icon_name="audio-volume-muted-symbolic"
+   elseif (volume >= 0 and volume < 25) then
+      volume_icon_name="audio-volume-muted-symbolic"
+   elseif (volume < 50) then
+      volume_icon_name="audio-volume-low-symbolic"
+   elseif (volume < 75) then
+      volume_icon_name="audio-volume-medium-symbolic"
+   elseif (volume <= 100) then
+      volume_icon_name="audio-volume-high-symbolic"
+   end
+   widget.image = path_to_icons .. volume_icon_name .. ".svg"
+   volume_popup.text = string.format("%u%%", volume)
 end
 
 --[[ allows control volume level by:
@@ -40,17 +47,19 @@ end
 volume_widget:connect_signal(
    "button::press", function(_,_,_,button)
       if (button == 4) then
-	 awful.spawn("amixer -D pulse sset Master 5%+", false)
+	 awful.spawn("amixer -c 1 sset Master 5%+", false)
       elseif (button == 5) then
-	 awful.spawn("amixer -D pulse sset Master 5%-", false)
+	 awful.spawn("amixer -c 1 sset Master 5%-", false)
       elseif (button == 1) then
-	 awful.spawn("amixer -D pulse sset Master toggle", false)
+	 awful.spawn("amixer -c 1 sset Master toggle", false)
       elseif (button == 3) then
 	 awful.spawn("pavucontrol")
       end
     
-    spawn.easy_async(request_command, function(stdout, stderr, exitreason, exitcode)
-        update_graphic(volume_widget, stdout, stderr, exitreason, exitcode)
+      spawn.easy_async(request_command,
+		       function(stdout, stderr, exitreason, exitcode)
+			  update_graphic(volume_widget, stdout, stderr,
+					 exitreason, exitcode)
     end)
 end)
 
