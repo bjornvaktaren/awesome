@@ -6,6 +6,7 @@ require("awful.autofocus")
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
+beautiful.init(awful.util.getdir("config") .. "themes/solar/theme.lua")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -14,13 +15,9 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 require("awful.hotkeys_popup.keys.vim")
 -- Mikael's additions
 -- Add network-manager widget
-awful.util.spawn("nm-applet")
--- Add volume widget
-require("volume")
--- -- Add quicklaunch
--- quicklaunch = require("quicklaunch")
--- Autostart programs
-awful.util.spawn_with_shell("~/.config/awesome/autorun.sh")
+awful.spawn("nm-applet")
+-- Set keyboard
+awful.spawn('setxkbmap -layout "us,se" -option "ctrl:nocaps" -option "grp:rctrl_rshift_toggle"')
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -49,11 +46,16 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(awful.util.getdir("config") .. "themes/default/theme.lua")
 for s = 1, screen.count() do
    gears.wallpaper.maximized(beautiful.wallpaper, s, true)
 end
 -- beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
+
+-- Widgets
+-- Add volume widget
+require("volume")
+-- Add cpu monitor widget
+-- require("cpu")
 
 -- Host-specific configuration
 local hostname = io.lines("/proc/sys/kernel/hostname")

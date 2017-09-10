@@ -1,49 +1,54 @@
 local awful = require("awful")
 local wibox = require("wibox")
+local beautiful = require("beautiful")
 local watch = require("awful.widget.watch")
 local spawn = require("awful.spawn")
 
-local path_to_icons = "/usr/share/icons/Arc/status/symbolic/"
 local request_command = 'amixer -c 1 sget Master'
-
+   
 volume_widget = wibox.widget {
-    {
-        id = "icon",
-   	image = path_to_icons .. "audio-volume-muted-symbolic.svg",
-	resize = false,
-        widget = wibox.widget.imagebox,
-    },
-    layout = wibox.container.margin(brightness_icon, 0, 0, 3),
-    set_image = function(self, path)
-        self.icon.image = path
-    end
+   {
+      id               = 'bar',
+      max_value        = 1,
+      value            = 0.5,
+      forced_width     = 80,
+      border_width     = 1,
+      paddings         = 2,
+      color            = beautiful.fg_normal,
+      border_color     = beautiful.fg_normal,
+      background_color = beautiful.bg_normal,
+      widget           = wibox.widget.progressbar,
+   },
+   {
+      id     = 'mute_indicator',
+      text   = '',
+      align  = 'center',
+      color  = '#2aa198',
+      widget = wibox.widget.textbox,
+   },
+   spacing  = 4,
+   layout   = wibox.layout.stack,
+   set_value = function(self, value)
+      self.bar.value = value
+   end,
+   set_text = function(self, text)
+      self.mute_indicator.text = text
+   end
 }
-volume_popup = awful.tooltip({objects = {volume_widget}})
 
-local update_graphic = function(widget, stdout, stderr, reason, exit_code)
+local update_bar = function(widget, stdout, stderr, reason, exit_code)
    local mute = string.match(stdout, "%[(o%D%D?)%]")
    local volume = string.match(stdout, "(%d?%d?%d)%%")
    volume = tonumber(string.format("% 3d", volume))
-   local volume_icon_name
    if mute == "off"  then
-      volume_icon_name="audio-volume-muted-symbolic"
-   elseif (volume >= 0 and volume < 25) then
-      volume_icon_name="audio-volume-muted-symbolic"
-   elseif (volume < 50) then
-      volume_icon_name="audio-volume-low-symbolic"
-   elseif (volume < 75) then
-      volume_icon_name="audio-volume-medium-symbolic"
-   elseif (volume <= 100) then
-      volume_icon_name="audio-volume-high-symbolic"
+      widget.text = 'muted'
+      widget.value = 0.0
+   elseif  mute == "on"  then
+      widget.text = ''
+      widget.value = volume/100.0
    end
-   widget.image = path_to_icons .. volume_icon_name .. ".svg"
-   volume_popup.text = string.format("%u%%", volume)
 end
 
---[[ allows control volume level by:
-- clicking on the widget to mute/unmute
-- scrolling when curson is over the widget
-]]
 volume_widget:connect_signal(
    "button::press", function(_,_,_,button)
       if (button == 4) then
@@ -58,9 +63,9 @@ volume_widget:connect_signal(
     
       spawn.easy_async(request_command,
 		       function(stdout, stderr, exitreason, exitcode)
-			  update_graphic(volume_widget, stdout, stderr,
+			  update_bar(volume_widget, stdout, stderr,
 					 exitreason, exitcode)
     end)
 end)
 
-watch(request_command, 1, update_graphic, volume_widget)
+watch(request_command, 1, update_bar, volume_widget)
