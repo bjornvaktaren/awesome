@@ -6,6 +6,7 @@ require("awful.autofocus")
 local wibox = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
+beautiful.init(awful.util.getdir("config") .. "themes/solar/theme.lua")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
@@ -14,16 +15,9 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 require("awful.hotkeys_popup.keys.vim")
 -- Mikael's additions
 -- Add network-manager widget
-awful.util.spawn("nm-applet")
--- Add battery widget
-require("battery")
--- Add volume widget
-require("volume")
--- Add brightness widget
-brightness = require("brightness")
-brightness_ctrl = brightness({step=10})
--- Autostart programs
-awful.util.spawn_with_shell("~/.config/awesome/autorun.sh")
+awful.spawn("nm-applet")
+-- Set keyboard
+awful.spawn('setxkbmap -layout "us,se" -option "ctrl:nocaps" -option "grp:rctrl_rshift_toggle"')
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -52,11 +46,21 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(awful.util.getdir("config") .. "themes/default/theme.lua")
 for s = 1, screen.count() do
    gears.wallpaper.maximized(beautiful.wallpaper, s, true)
 end
--- beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
+
+-- Widgets
+-- Add volume widget
+require("volume")
+-- -- Add cpu monitor widget
+-- require("cpu")
+-- Add battery widget
+require("battery")
+-- Add brightness widget
+brightness = require("brightness")
+brightness_ctrl = brightness({step=10})
+
 
 -- Host-specific configuration
 local hostname = io.lines("/proc/sys/kernel/hostname")
@@ -68,6 +72,10 @@ for line in hostname do
       screenshooter = "xfce4-screenshooter"
       awful.util.spawn("cernbox")
    end
+   if line == 'vi7' then
+      terminal = "xfce4-terminal"
+      screenshooter = "xfce4-screenshooter"
+   end
    if line == 'mmpem' then
       terminal = "xterm"
       screenshooter = "scrot"
@@ -75,6 +83,11 @@ for line in hostname do
 end
 editor = os.getenv("EDITOR") or "emacs -nw"
 editor_cmd = terminal .. " -e " .. editor
+
+-- -- quicklaunch specification
+-- local launchbar = quicklaunch:bar({
+--       { "Pavucontrol", "pavucontrol.png", "pavucontrol"},
+-- })
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -241,6 +254,7 @@ awful.screen.connect_for_each_screen(function(s)
             mylauncher,
             s.mytaglist,
             s.mypromptbox,
+	    -- quicklaunch,
 	 },
 	 s.mytasklist, -- Middle widget
 	 { -- Right widgets
