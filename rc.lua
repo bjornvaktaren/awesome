@@ -67,7 +67,7 @@ local hostname = io.lines("/proc/sys/kernel/hostname")
 terminal = "xterm"
 screenshooter = "scrot"
 for line in hostname do
-   if line == 'w1c' then
+   if line == 'phy-atlas-akto' then
       terminal = "xfce4-terminal"
       screenshooter = "xfce4-screenshooter"
       awful.util.spawn("cernbox")
