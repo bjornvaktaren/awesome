@@ -4,7 +4,7 @@ local beautiful = require("beautiful")
 local watch = require("awful.widget.watch")
 local spawn = require("awful.spawn")
 
-local request_command = 'pamixer --get-volume'
+-- local request_command = 'pamixer --get-volume'
 
 -- awful.spawn("pamixer --sink 0 --mute", false)
 -- awful.spawn("pamixer --sink 1 --unmute", false)
@@ -61,12 +61,13 @@ local update_sink = function(widget, stdout, stderr, reason, exit_code)
 end
 
 local update_slider = function(widget, stdout, stderr, reason, exit_code)
-   local volume = tonumber(stdout)
-   local mute = 'on'
-   if mute == "off"  then
+   pamixer_out = stdout:gmatch("%w+")
+   local mute = pamixer_out(1)
+   local volume = tonumber(pamixer_out(0))
+   if mute == "true"  then
       widget.text = 'muted'
       widget.value = 0.0
-   elseif  mute == "on"  then
+   else
       widget.text = ''
       widget.value = volume/100.0
    end
@@ -79,30 +80,29 @@ end
 volume_widget.slider:connect_signal(
    "button::press", function(_,_,_,button)
       if (button == 4) then
-	 awful.spawn("pamixer --sink 1 --increase 5", false)
+	 awful.spawn("pamixer --increase 5", false)
       elseif (button == 5) then
-	 awful.spawn("pamixer --sink 1 --decrease 5", false)
+	 awful.spawn("pamixer --decrease 5", false)
       elseif (button == 1) then
-	 awful.spawn("pamixer --sink 0 --toggle-mute", false)
-	 awful.spawn("pamixer --sink 1 --toggle-mute", false)
+	 awful.spawn("pamixer --toggle-mute", false)
       elseif (button == 3) then
 	 awful.spawn("pavucontrol")
       end
-      spawn.easy_async(request_command,
+      spawn.easy_async('pamixer --get-mute --get-volume',
 		       function(stdout, stderr, exitreason, exitcode)
 			  update_slider(volume_widget, stdout, stderr,
 					exitreason, exitcode)
       end)
-      spawn.easy_async('pamixer --sink 1 --get-mute',
-		       function(stdout, stderr, exitreason, exitcode)
-			  update_sink(volume_widget, stdout, stderr,
-				      exitreason, exitcode)
-      end)
+      -- spawn.easy_async('pamixer --get-mute',
+      -- 		       function(stdout, stderr, exitreason, exitcode)
+      -- 			  update_sink(volume_widget, stdout, stderr,
+      -- 				      exitreason, exitcode)
+      -- end)
 end)
 
-watch(request_command, 1, update_slider, volume_widget)
+-- watch(request_command, 1, update_slider, volume_widget)
 
-watch('pamixer --sink 1 --get-mute', 1, update_sink, volume_widget)
+watch('pamixer --get-mute --get-volume', 1, update_slider, volume_widget)
 
 -- local update_source = function(widget, stdout, stderr, reason, exit_code)
 --    local mute = string.match(stdout, "%[(o%D%D?)%]")
